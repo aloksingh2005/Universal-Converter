@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Universal File Converter - Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#6366f1">
+</head>
+
+<body>
+    <!-- Top Navigation -->
+    <nav class="topbar" aria-label="Top Navigation">
+        <div class="topbar-left">
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
+            <div class="logo" aria-label="App logo">
+                <i class="fas fa-sync-alt logo-icon" aria-hidden="true"></i>
+                <span class="logo-text">FileConverter Pro</span>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <div class="search-box" role="search">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <label for="searchInput" class="visually-hidden">Search converters</label>
+                <input type="text" placeholder="Search converters..." id="searchInput" autocomplete="off">
+            </div>
+            <button class="notification-btn" aria-label="Notifications">
+                <i class="fas fa-bell" aria-hidden="true"></i>
+                <span class="notification-badge">{{ dashboard_stats.total_conversions }}</span>
+            </button>
+            <div class="user-profile" tabindex="0" aria-label="User menu">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
+                    alt="User avatar" class="profile-avatar">
+                <span class="profile-name">User</span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-section">
+                <h3 class="section-title">Conversion Tools</h3>
+                <ul class="sidebar-menu">
+                    <li class="menu-item active" data-category="dashboard" tabindex="0" aria-current="page">
+                        <i class="fas fa-home" aria-hidden="true"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    {% for cat_id, cat in tools_data.items() %}
+                    <li class="menu-item" data-category="{{ cat_id }}" tabindex="0">
+                        <i class="{{ cat.icon }}" aria-hidden="true"></i>
+                        <span>{{ cat.title }}</span>
+                        <span class="menu-badge">{{ cat.tools|length }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="section-title">Recent Files</h3>
+                <ul class="recent-files">
+                    <li class="recent-item">
+                        <i class="fas fa-file-pdf" aria-hidden="true"></i>
+                        <span>document.pdf</span>
+                    </li>
+                    <li class="recent-item">
+                        <i class="fas fa-image" aria-hidden="true"></i>
+                        <span>image.png</span>
+                    </li>
+                    <li class="recent-item">
+                        <i class="fas fa-file-word" aria-hidden="true"></i>
+                        <span>report.docx</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="upgrade-card">
+                <div class="upgrade-content">
+                    <i class="fas fa-crown" aria-hidden="true"></i>
+                    <h4>Pro Version</h4>
+                    <p>100% Free & Offline</p>
+                    <button class="upgrade-btn" type="button">✨ Enjoy</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" role="main">
+        <!-- Dashboard -->
+        <div class="content-section active" id="dashboard">
+            <div class="page-header">
+                <h1 class="page-title">Universal File Converter</h1>
+                <p class="page-subtitle">Convert your files quickly and securely — 100% Free & Offline</p>
+            </div>
+
+            <div class="stats-grid" aria-label="Statistics">
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number">{{ dashboard_stats.total_tools }}</div>
+                        <div class="stat-label">Available Tools</div>
+                    </div>
+                    <div class="stat-icon" aria-hidden="true">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number">{{ dashboard_stats.total_categories }}</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                    <div class="stat-icon" aria-hidden="true">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number">{{ dashboard_stats.total_conversions }}</div>
+                        <div class="stat-label">Total Conversions</div>
+                    </div>
+                    <div class="stat-icon" aria-hidden="true">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-number">{{ dashboard_stats.total_files }}</div>
+                        <div class="stat-label">Files Processed</div>
+                    </div>
+                    <div class="stat-icon" aria-hidden="true">
+                        <i class="fas fa-file"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <h2 class="section-title">Quick Actions</h2>
+                <div class="action-grid">
+                    {% for cat_id, cat in tools_data.items() %}
+                    <div class="action-card" onclick="showCategory('{{ cat_id }}')" tabindex="0" role="button"
+                        aria-pressed="false">
+                        <i class="{{ cat.icon }}" style="color: {{ cat.color }};" aria-hidden="true"></i>
+                        <h3>{{ cat.title }}</h3>
+                        <p>{{ cat.tools|length }} tools available</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Tool Categories -->
+        {% for cat_id, cat in tools_data.items() %}
+        <div class="content-section" id="{{ cat_id }}">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="{{ cat.icon }}" style="color: {{ cat.color }};" aria-hidden="true"></i>
+                    {{ cat.title }}
+                </h1>
+                <p class="page-subtitle">{{ cat.description }}</p>
+            </div>
+
+            <div class="converter-grid">
+                {% for tool in cat.tools %}
+                <div class="converter-card" data-tool="{{ tool.name }}" data-input-type="{{ tool.input_type }}" {% if
+                    tool.get('min_files') %}data-min-files="{{ tool.min_files }}" {% endif %}>
+                    <div class="card-header">
+                        <div class="card-info">
+                            <i class="{{ cat.icon }}" style="color: {{ cat.color }};" aria-hidden="true"></i>
+                            <h3>{{ tool.name }}</h3>
+                        </div>
+                        {% if tool.get('min_files') %}
+                        <span class="tool-badge">{{ tool.min_files }}+ files</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body">
+                        <p class="tool-description">{{ tool.description }}</p>
+
+                        <!-- Upload Zone -->
+                        <div class="upload-zone" data-input-id="{{ cat_id }}-{{ loop.index }}-file"
+                            data-accept="{{ tool.accept }}">
+                            <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
+                            <p>
+                                {% if tool.input_type == 'multiple' %}
+                                Drop {{ tool.get('min_files', 'multiple') }} files here
+                                {% else %}
+                                Drop file here
+                                {% endif %}
+                            </p>
+                            <span class="upload-hint">Supported: {{ tool.accept }}</span>
+
+                            <input type="file" id="{{ cat_id }}-{{ loop.index }}-file" accept="{{ tool.accept }}" {% if
+                                tool.input_type=='multiple' %}multiple{% endif %} hidden>
+                        </div>
+
+                        <!-- Tool Options -->
+                        {% if tool.options %}
+                        {% for option in tool.options %}
+                        <div class="options-row">
+                            {% if option.type == 'select' %}
+                            <label for="{{ option.name }}-{{ cat_id }}-{{ loop.index }}">{{ option.label }}: </label>
+                            <select class="option-select" id="{{ option.name }}-{{ cat_id }}-{{ loop.index }}"
+                                name="{{ option.name }}">
+                                {% for val in option.options_list %}
+                                <option value="{{ val }}">{{ val }}{% if option.name == 'angle' %}°{% endif %}</option>
+                                {% endfor %}
+                            </select>
+                            {% elif option.type == 'text' %}
+                            <label for="{{ option.name }}-{{ cat_id }}-{{ loop.index }}">{{ option.label }}: </label>
+                            <input type="text" class="option-input" id="{{ option.name }}-{{ cat_id }}-{{ loop.index }}"
+                                name="{{ option.name }}" placeholder="{{ option.placeholder }}" autocomplete="off">
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+
+                        <!-- Action Button -->
+                        <button class="action-btn" type="button"
+                            onclick="processFile('{{ tool.endpoint }}', '{{ cat_id }}-{{ loop.index }}-file', '{{ tool.name }}', '{{ cat_id }}', {{ loop.index }})"
+                            aria-label="{{ tool.name }}">
+                            <i class="fas fa-magic" aria-hidden="true"></i> {{ tool.name }}
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+
+    <!-- Progress Modal -->
+    <div class="modal" id="progressModal" role="dialog" aria-modal="true" aria-labelledby="progressTitle"
+        aria-describedby="progressMessage">
+        <div class="modal-content">
+            <div class="progress-container">
+                <div class="progress-spinner" aria-hidden="true"></div>
+                <h3 id="progressTitle">Converting...</h3>
+                <p id="progressMessage">Please wait while we process your file</p>
+                <div class="progress-bar-wrapper" aria-hidden="true">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+                <div class="modal-actions">
+                    <button id="progressCancel" class="btn-cancel" type="button"
+                        aria-label="Cancel operation">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- NoScript notice -->
+    <noscript>
+        <div
+            style="margin: 100px auto; max-width: 800px; background: #fee2e2; color: #991b1b; padding: 16px; border-radius: 8px; text-align: center;">
+            This application requires JavaScript to function properly. Please enable JavaScript in your browser
+            settings.
+        </div>
+    </noscript>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
